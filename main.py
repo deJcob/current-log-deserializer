@@ -1,13 +1,8 @@
-# This is a sample Python script.
-import copy
-
 import numpy as np
 from matplotlib import pyplot as plt
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-class currentData:
+class CurrentData:
 
     def __init__(self):
         self.timestamp = []
@@ -15,16 +10,16 @@ class currentData:
         self.currentB = []
 
 
-def readLog(name, startInZero = True):
+def read_log(name, start_in_zero = True):
 
-    data = currentData()
+    data = CurrentData()
 
     with open(name, "rb") as f:
 
         byte = f.read(8)
         timestamp_1 = np.frombuffer(byte, dtype='int64')[0]/(10**9)
 
-        if startInZero:
+        if start_in_zero:
             data.timestamp.append(0)
         else:
             data.timestamp.append(timestamp_1)
@@ -32,7 +27,7 @@ def readLog(name, startInZero = True):
         while byte != b"":
             byte = f.read(4)
             size = np.frombuffer(byte, dtype='int32')[0]
-            byte = f.read(4)
+            f.read(4)
             for i in range(size):
                 data.currentA.append(np.frombuffer(f.read(8), dtype='float64')[0])
                 data.currentB.append(np.frombuffer(f.read(8), dtype='float64')[0])
@@ -52,11 +47,9 @@ def readLog(name, startInZero = True):
 
     return data
 
-# hexdump -C current\ log\ 23-07-2021\ 14-09-04 -n 5000
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    temp = readLog('test_file')
+    temp = read_log('test_file')
 
     plt.title("Current log chart")
     plt.xlabel("Time [s]")
@@ -64,4 +57,3 @@ if __name__ == '__main__':
     plt.plot(temp.timestamp, temp.currentA)
     plt.plot(temp.timestamp, temp.currentB)
     plt.show()
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
