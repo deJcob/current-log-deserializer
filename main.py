@@ -15,20 +15,23 @@ class currentLog:
 def readLog(name):
 
     data = currentLog()
+    frames_counter = 0
 
     with open(name, "rb") as f:
-        byte = f.read(8)
-        timestamp = np.frombuffer(byte, dtype='int64')[0]
-        print(timestamp)
-        byte = f.read(4)
-        size = np.frombuffer(byte, dtype='int32')[0]
-        byte = f.read(4)
-        print(size)
-        for i in range(size):
-            byte1 = f.read(8)
-            byte2 = f.read(8)
-            data.currentA.append(np.frombuffer(byte1, dtype='float64')[0])
-            data.currentB.append(np.frombuffer(byte2, dtype='float64')[0])
+        byte = bytes(1)
+        while byte != b"":
+            frames_counter += 1
+            byte = f.read(8)
+            timestamp = np.frombuffer(byte, dtype='int64')[0]
+            print(timestamp)
+            byte = f.read(4)
+            size = np.frombuffer(byte, dtype='int32')[0]
+            byte = f.read(4)
+            print(size)
+            for i in range(size):
+                data.currentA.append(np.frombuffer(f.read(8), dtype='float64')[0])
+                data.currentB.append(np.frombuffer(f.read(8), dtype='float64')[0])
+            print(frames_counter)
 
         while byte != b"":
             # print(byte)
