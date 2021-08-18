@@ -4,16 +4,19 @@ import numpy as np
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
+class currentLog:
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    def __init__(self):
+        self.timestamps = []
+        self.currentA = []
+        self.currentB = []
 
-# hexdump -C current\ log\ 23-07-2021\ 14-09-04 -n 5000
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    with open("test_file", "rb") as f:
+def readLog(name):
+
+    data = currentLog()
+
+    with open(name, "rb") as f:
         byte = f.read(8)
         timestamp = np.frombuffer(byte, dtype='int64')[0]
         print(timestamp)
@@ -24,7 +27,8 @@ if __name__ == '__main__':
         for i in range(size):
             byte1 = f.read(8)
             byte2 = f.read(8)
-            print(np.frombuffer(byte1, dtype='float64')[0], np.frombuffer(byte2, dtype='float64')[0])
+            data.currentA.append(np.frombuffer(byte1, dtype='float64')[0])
+            data.currentB.append(np.frombuffer(byte2, dtype='float64')[0])
 
         while byte != b"":
             # print(byte)
@@ -33,4 +37,15 @@ if __name__ == '__main__':
             timestamp = np.frombuffer(byte, dtype='int64')
             # print(timestamp)
 
+    return data
+
+def print_hi(name):
+    # Use a breakpoint in the code line below to debug your script.
+    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+
+# hexdump -C current\ log\ 23-07-2021\ 14-09-04 -n 5000
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    readLog('test_file')
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
