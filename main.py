@@ -9,6 +9,8 @@ if __name__ == '__main__':
     temp = read_log('current log 23-07-2021 16-07-02', start_in_zero=False)
     temp2 = read_log('current log 23-07-2021 14-09-04', start_in_zero=False)
     bag = bp.bagreader('2021-07-23-16-07-01.bag')
+
+
     print(bag.topic_table)
 
     # plt.title("Current log chart")

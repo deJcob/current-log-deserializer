@@ -19,7 +19,7 @@ def read_log(name, start_in_zero = True):
         timestamp_1 = np.frombuffer(byte, dtype='int64')[0]/(10**9) # nsec to sec
 
         if start_in_zero:                       # True if you want to normalize time from 0
-            data.timestamp.append(0)
+            data.timestamp.append(np.float64(0.0))
         else:                                   # Time from ros.time.now().ToNsec
             data.timestamp.append(timestamp_1)
 
