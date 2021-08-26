@@ -2,13 +2,14 @@ import numpy as np
 import bagpy as bp
 import pandas as pd
 import scipy.fftpack
+import math
 
 from CurrentDeserailizer import read_log, CurrentData
 from matplotlib import pyplot as plt
 
 if __name__ == '__main__':
-    temp = read_log('current/current log 23-07-2021 16-01-54', start_in_zero=False)
-    bag = bp.bagreader('bags/2021-07-23-16-01-53.bag')
+    temp = read_log('current/current log 23-07-2021 16-03-38', start_in_zero=False)
+    bag = bp.bagreader('bags/2021-07-23-16-03-37.bag')
 
 
     print(bag.topic_table)
@@ -79,22 +80,38 @@ if __name__ == '__main__':
     velmsgs = bag.odometry_data()
     veldf = pd.read_csv(velmsgs[0])
 
+    dx = veldf['pose.x']
+    dy = veldf['pose.y']
 
-    plt.plot(veldf['Time'], veldf['orientation.z'])
-    # plt.plot(veldf['Time'], veldf['linear.x'])
-    # plt.plot(veldf['Time'], veldf['angular.z'])
+    dist = dx**2 + dy**2
+    dist = np.sqrt(dist)
+
+    # plt.plot(veldf['Time'], veldf['orientation.z'])
+    plt.plot(veldf['Time'], dist)
+    plt.plot(veldf['Time'], veldf['linear.x'])
+    # plt.plot(veldf['Time'], )
     laser = bag.message_by_topic('/joint_states/')
     laserdf = pd.read_csv(laser)
     cmdvel = bag.message_by_topic('/diff_drive/cmd_vel')
     cmdveldf = pd.read_csv(cmdvel)
-    # laser2 = pd.read_csv(laser)
-    # laser2.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
+    laser2 = bag.message_by_topic('/scan')
+    laser2df = pd.read_csv(laser2)
+    laser3 = bag.message_by_topic('/robot_driver/laser_ruler/scan_1')
+    laser3df = pd.read_csv(laser3)
+    laser3df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
+    # laser2df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
 
-    # plt.plot(laserdf['Time'], laserdf['effort_0']+0.58)
-    # plt.plot(laserdf['Time'], laserdf['effort_1']+0.46)
+    plt.plot(laser2df['Time'], laser2df['ranges_0'])
+    plt.plot(laser2df['Time'], laser2df['ranges_180'])
+    plt.plot(laserdf['Time'], laserdf['effort_0']+0.58)
+    plt.plot(laserdf['Time'], laserdf['effort_1']+0.46)
+    # plt.plot(laserdf['Time'], (laserdf['effort_0']+0.58)-(laserdf['effort_1']+0.45))
+    plt.plot(laserdf['Time'], (laserdf['effort_0']+0.58)+(laserdf['effort_1']+0.45)/veldf['linear.x'])
     # plt.plot(laserdf['Time'], laserdf['velocity_0']*0.05)
     # plt.plot(laserdf['Time'], laserdf['velocity_1']*0.05)
-    # plt.plot(cmdveldf['Time'], cmdveldf['linear.x'])
+    plt.plot(laser3df['Time'], laser3df['range'])
+
+    plt.plot(cmdveldf['Time'], cmdveldf['linear.x'])
     plt.show()
 
 
