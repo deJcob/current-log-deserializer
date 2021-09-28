@@ -54,24 +54,24 @@ if __name__ == '__main__':
 
     # # Pochylnia i karton 0.7 m/s
     #
-    # bags=['2021-07-23-15-40-40.bag',
-    #      '2021-07-23-15-42-59.bag',
-    #      '2021-07-23-15-45-19.bag',
-    #      '2021-07-23-15-48-15.bag',
-    #      '2021-07-23-15-50-13.bag',
-    #      '2021-07-23-15-52-25.bag']
-    #
-    # logs=['current log 23-07-2021 15-40-41',
-    #      'current log 23-07-2021 15-43-00',
-    #      'current log 23-07-2021 15-45-20',
-    #      'current log 23-07-2021 15-48-16',
-    #      'current log 23-07-2021 15-50-13',
-    #      'current log 23-07-2021 15-52-26']
+    bags=['2021-07-23-15-40-40.bag',
+         '2021-07-23-15-42-59.bag',
+         '2021-07-23-15-45-19.bag',
+         '2021-07-23-15-48-15.bag',
+         '2021-07-23-15-50-13.bag',
+         '2021-07-23-15-52-25.bag']
+
+    logs=['current log 23-07-2021 15-40-41',
+         'current log 23-07-2021 15-43-00',
+         'current log 23-07-2021 15-45-20',
+         'current log 23-07-2021 15-48-16',
+         'current log 23-07-2021 15-50-13',
+         'current log 23-07-2021 15-52-26']
 
     # Pochylnia i karton 1.7 m/s
     # logs = ['current log 23-07-2021 16-00-13', 'current log 23-07-2021 16-01-54', 'current log 23-07-2021 16-03-38', 'current log 23-07-2021 16-05-08', 'current log 23-07-2021 16-07-02']
     # bags = ['2021-07-23-16-00-12.bag', '2021-07-23-16-01-53.bag', '2021-07-23-16-03-37.bag', '2021-07-23-16-05-07.bag', '2021-07-23-16-07-01.bag']
-    colours = ['b', 'g', 'r', 'k', 'm', 'y']
+    colours = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
 
     timecomp = 0
 
@@ -92,15 +92,15 @@ if __name__ == '__main__':
 
 
         # moving mean
-        # N = 20
-        # filtered = CurrentData()
-        # filtered.currentA = np.convolve(temp.currentA, np.ones(N)/N, mode='valid')
-        # filtered.currentB = np.convolve(temp.currentB, np.ones(N)/N, mode='valid')
-        # filtered.timestamp = temp.timestamp[0:len(temp.timestamp)-N+1]
-        # # filtered2 = CurrentData()
-        # # filtered2.currentA = np.convolve(temp2.currentA, np.ones(N)/N, mode='valid')
-        # # filtered2.currentB = np.convolve(temp2.currentB, np.ones(N)/N, mode='valid')
-        # # filtered2.timestamp = temp2.timestamp[0:len(temp2.timestamp)-N+1]
+        N = 137
+        filtered = CurrentData()
+        filtered.currentA = np.convolve(temp.currentA, np.ones(N)/N, mode='valid')
+        filtered.currentB = np.convolve(temp.currentB, np.ones(N)/N, mode='valid')
+        filtered.timestamp = temp.timestamp[0:len(temp.timestamp)-N+1]
+        # filtered2 = CurrentData()
+        # filtered2.currentA = np.convolve(temp2.currentA, np.ones(N)/N, mode='valid')
+        # filtered2.currentB = np.convolve(temp2.currentB, np.ones(N)/N, mode='valid')
+        # filtered2.timestamp = temp2.timestamp[0:len(temp2.timestamp)-N+1]
         # plt.title("Current log chart filtered")
         # plt.xlabel("Time [s]")
         # plt.ylabel("Current [A]")
@@ -174,14 +174,14 @@ if __name__ == '__main__':
         laser4 = bag.message_by_topic('/robot_driver/laser_ruler/scan_3')
         laser4df = pd.read_csv(laser4)
         laser4df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
-        # laser2df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
+        #laser2df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
         imu = bag.message_by_topic('/stm_imu')
         imudf = pd.read_csv(imu)
 
         # plt.plot(imudf['Time'], imudf['linear_acceleration.x'], label='Acc X')
         # plt.plot(imudf['Time'], imudf['linear_acceleration.y'], label='Acc Y')
         # plt.plot(imudf['Time'], imudf['linear_acceleration.z'], label='Acc Z')
-        # plt.plot(laser2df['Time'], laser2df['ranges_0'], label='lidar 0')
+        plt.plot(laser2df['Time']-timecomp, laser2df['ranges_180'], label='lidar 180')
         # plt.plot(laser2df['Time'], laser2df['ranges_180'], label='lidar 180')
         # plt.plot(laserdf['Time'], laserdf['effort_0']+0.58, label='Effort 0')
         # plt.plot(laserdf['Time'], laserdf['effort_1']+0.46, label='Effort 1')
@@ -217,31 +217,56 @@ if __name__ == '__main__':
                         timesum.append(laserdf['Time'][i])
                         coefsum.append(coef[-1]+coef2[-1])
 
-        plt.plot(time-timecomp,  2+np.asarray(coef) / (max(max(coef), abs(min(coef)))), label='Amperopredkosci', color=colours[k])
-        plt.plot(time2-timecomp,  np.asarray(coef2) / (max(max(coef2), abs(min(coef2)))), label='Amperopredkosci', color=colours[k])
+        plt.plot(time-timecomp,  2+np.asarray(coef) / (max(max(coef), abs(min(coef)))), label='Amperopredkosci', color=colours[k+2])
+        plt.plot(time2-timecomp,  np.asarray(coef2) / (max(max(coef2), abs(min(coef2)))), label='Amperopredkosci', color=colours[k+2])
 
-        plt.plot(timesum - timecomp, -2 + np.asarray(coefsum) / (max(max(coefsum), abs(min(coefsum)))), label='Amperopredkosci', color=colours[k])
+        plt.plot(timesum - timecomp, -2 + np.asarray(coefsum) / (max(max(coefsum), abs(min(coefsum)))), label='Amperopredkosci', color=colours[k+1])
         # plt.plot(cmdveldf['Time']-timecomp, cmdveldf['linear.x'], label='Vel x')
-        plt.plot(laserdf['Time']-timecomp, -8+laserdf['velocity_0']*0.05, label='Vel x', color=colours[k])
-        plt.plot(laserdf['Time'] - timecomp, -10 + laserdf['velocity_1'] * 0.05, label='Vel x', color=colours[k])
+        plt.plot(laserdf['Time']-timecomp, 5+laserdf['velocity_0']*0.05, label='Vel x', color=colours[k+1])
+        plt.plot(laserdf['Time'] - timecomp, 7 + laserdf['velocity_1'] * 0.05, label='Vel x', color=colours[k+1])
 
+        # liczba 50 wynika ze sredniej maksymalnej liczby - chodzi o to zebysmy mieli odniesienie a nie normalizacje
         d = np.gradient(laserdf['effort_0'], laserdf['Time'])
-
-        plt.plot(laserdf['Time']-timecomp, 5+d/(max(d)), label='pochodna', color=colours[k])
+        print(max(d))
+        plt.plot(laserdf['Time']-timecomp, 5+(d/50), label='pochodna', color=colours[k])
 
         d = np.gradient(laserdf['effort_1'], laserdf['Time'])
+        print(max(d))
+        plt.plot(laserdf['Time']-timecomp, 7+(d/50), label='pochodna', color=colours[k])
 
-        plt.plot(laserdf['Time']-timecomp, 7+d/(max(d)), label='pochodna', color=colours[k])
+        d = np.gradient(filtered.currentB, filtered.timestamp)
+        print(max(d))
+        # plt.plot(filtered.timestamp-timecomp, 5+(d/500), label='pochodna', color=colours[k+2])
+        plt.plot(filtered.timestamp-timecomp, 5+(filtered.currentB/2), label='Current A', color=colours[k+2])
+        d = np.gradient(filtered.currentA, filtered.timestamp)
+        print(max(d))
+        # plt.plot(filtered.timestamp-timecomp, 7+(d/500), label='pochodna', color=colours[k+2])
+        plt.plot(filtered.timestamp-timecomp, 7+(filtered.currentA/2), label='Current B', color=colours[k+2])
+        # liczba 200 wynika z sredniej liczby
+        d = np.gradient(laserdf['velocity_0'], laserdf['Time'])
+        print(max(d))
+        plt.plot(laserdf['Time']-timecomp, 5+(d/200), label='pochodna predkosci', color=colours[k+3])
+
+        d = np.gradient(laserdf['velocity_1'], laserdf['Time'])
+        print(max(d))
+        plt.plot(laserdf['Time']-timecomp, 7+(d/200), label='pochodna predkosci', color=colours[k+3])
 
         # plt.plot(veldf['Time']-timecomp, dist, label='Dist')
+        d = np.gradient(dist, veldf['Time']-timecomp)
+        print(max(d))
+        plt.plot(veldf['Time']-timecomp, 3+(d/200), label='pochodna dystansu', color=colours[k+3])
+
+        d = np.gradient(laser2df['ranges_180'], laser2df['Time'])
+        print(max(d))
+        plt.plot(laser2df['Time']-timecomp, 1+(d*3), label='pochodna dystansu enkoder', color=colours[k+3])
+
         #
         plt.plot(laserdf['Time']-timecomp, laserdf['effort_0']+0.58-5, label='Effort 0',  color=colours[k])
         plt.plot(laserdf['Time']-timecomp, laserdf['effort_1']+0.46-7, label='Effort 1',  color=colours[k])
         plt.plot(laser3df['Time']-timecomp,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
         plt.plot(laser4df['Time']-timecomp,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
         # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
+
+
         plt.legend()
         plt.show()
-
-
-
