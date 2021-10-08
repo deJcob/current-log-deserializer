@@ -4,14 +4,21 @@ import pandas as pd
 from data import *
 import scipy.fftpack
 import math
+from labellines import labelLines, labelLine
 
 from CurrentDeserailizer import read_log, CurrentData
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
+def f(x, y):
+    return np.sin(np.sqrt(x ** 2 + y ** 2))
+
 if __name__ == '__main__':
 
     timecomp = 0
+
+    fig, axs = plt.subplots(len(bags))
+    # fig.suptitle('')
 
     for k in range(0, len(bags)):
         temp = read_log('current/' + logs[k], start_in_zero=False)
@@ -119,7 +126,7 @@ if __name__ == '__main__':
         # plt.plot(imudf['Time'], imudf['linear_acceleration.x'], label='Acc X')
         # plt.plot(imudf['Time'], imudf['linear_acceleration.y'], label='Acc Y')
         # plt.plot(imudf['Time'], imudf['linear_acceleration.z'], label='Acc Z')
-        plt.plot(laser2df['Time']-timecomp, laser2df['ranges_180'], label='lidar 180')
+        # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_180'], label='lidar 180')
         # plt.plot(laser2df['Time'], laser2df['ranges_180'], label='lidar 180')
         # plt.plot(laserdf['Time'], laserdf['effort_0']+0.58, label='Effort 0')
         # plt.plot(laserdf['Time'], laserdf['effort_1']+0.46, label='Effort 1')
@@ -131,88 +138,88 @@ if __name__ == '__main__':
         # plt.legend()
         # plt.plot(cmdveldf['Time'], cmdveldf['linear.x'], label='Vel x')
         # plt.show()
-
-        time = []
-        time2 = []
-        timesum = []
-        coef = []
-        coef2 = []
-        coefsum = []
-        print(len(veldf['Time']), len(laserdf['Time']))
-        j = 0
-        for i in range(0, len(laserdf['velocity_0'])):
-            if laserdf['Time'][i] > laserdf['Time'][j]:
-                j += 1
-                if j >= len(laserdf['Time']) or i >= len(laserdf['Time']):
-                    break
-                # print(veldf['linear.x'][i], laserdf['effort_0'][j], laserdf['effort_1'][j], i, j)
-                if (laserdf['velocity_1'][i] > 0.001):
-                    time2.append(laserdf['Time'][i])
-                    coef2.append((laserdf['effort_1'][j]+0.46) / laserdf['velocity_1'][i])
-                    if (laserdf['velocity_0'][i] > 0.001):
-                        time.append(laserdf['Time'][i])
-                        coef.append((laserdf['effort_0'][j]+0.58) / laserdf['velocity_0'][i])
-                        timesum.append(laserdf['Time'][i])
-                        coefsum.append(coef[-1]+coef2[-1])
-
-        plt.plot(time-timecomp,  2+np.asarray(coef) / (max(max(coef), abs(min(coef)))), label='Amperopredkosci', color=colours[k+2])
-        plt.plot(time2-timecomp,  np.asarray(coef2) / (max(max(coef2), abs(min(coef2)))), label='Amperopredkosci', color=colours[k+2])
-
-        plt.plot(timesum - timecomp, -2 + np.asarray(coefsum) / (max(max(coefsum), abs(min(coefsum)))), label='Amperopredkosci', color=colours[k+1])
-        # plt.plot(cmdveldf['Time']-timecomp, cmdveldf['linear.x'], label='Vel x')
-        plt.plot(laserdf['Time']-timecomp, 5+laserdf['velocity_0']*0.05, label='Vel x', color=colours[k+1])
-        plt.plot(laserdf['Time'] - timecomp, 7 + laserdf['velocity_1'] * 0.05, label='Vel x', color=colours[k+1])
-
-        # liczba 50 wynika ze sredniej maksymalnej liczby - chodzi o to zebysmy mieli odniesienie a nie normalizacje
-        d = np.gradient(laserdf['effort_0'], laserdf['Time'])
-        print(max(d))
-        plt.plot(laserdf['Time']-timecomp, 5+(d/50), label='pochodna', color=colours[k])
-
-        d = np.gradient(laserdf['effort_1'], laserdf['Time'])
-        print(max(d))
-        plt.plot(laserdf['Time']-timecomp, 7+(d/50), label='pochodna', color=colours[k])
-
-        d = np.gradient(filtered.currentB, filtered.timestamp)
-        print(max(d))
-        # plt.plot(filtered.timestamp-timecomp, 5+(d/500), label='pochodna', color=colours[k+2])
-        plt.plot(filtered.timestamp-timecomp, 5+(filtered.currentB/2), label='Current A', color=colours[k+2])
-        d = np.gradient(filtered.currentA, filtered.timestamp)
-        print(max(d))
-        # plt.plot(filtered.timestamp-timecomp, 7+(d/500), label='pochodna', color=colours[k+2])
-        plt.plot(filtered.timestamp-timecomp, 7+(filtered.currentA/2), label='Current B', color=colours[k+2])
-        # liczba 200 wynika z sredniej liczby
-        d = np.gradient(laserdf['velocity_0'], laserdf['Time'])
-        print(max(d))
-        plt.plot(laserdf['Time']-timecomp, 5+(d/200), label='pochodna predkosci', color=colours[k+3])
-
-        d = np.gradient(laserdf['velocity_1'], laserdf['Time'])
-        print(max(d))
-        plt.plot(laserdf['Time']-timecomp, 7+(d/200), label='pochodna predkosci', color=colours[k+3])
-
-        # plt.plot(veldf['Time']-timecomp, dist, label='Dist')
-        d = np.gradient(dist, veldf['Time']-timecomp)
-        print(max(d))
-        plt.plot(veldf['Time']-timecomp, 3+(d/200), label='pochodna dystansu', color=colours[k+3])
-
-        d = np.gradient(laser2df['ranges_180'], laser2df['Time'])
-        print(max(d))
-        plt.plot(laser2df['Time']-timecomp, 1+(d*3), label='pochodna dystansu enkoder', color=colours[k+3])
-
         #
-        plt.plot(laserdf['Time']-timecomp, laserdf['effort_0']+0.58-5, label='Effort 0',  color=colours[k])
-        plt.plot(laserdf['Time']-timecomp, laserdf['effort_1']+0.46-7, label='Effort 1',  color=colours[k])
-        plt.plot(laser3df['Time']-timecomp,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
-        plt.plot(laser4df['Time']-timecomp,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
-        # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
-        plt.grid()
-        plt.legend()
-        plt.show()
+        # time = []
+        # time2 = []
+        # timesum = []
+        # coef = []
+        # coef2 = []
+        # coefsum = []
+        # print(len(veldf['Time']), len(laserdf['Time']))
+        # j = 0
+        # for i in range(0, len(laserdf['velocity_0'])):
+        #     if laserdf['Time'][i] > laserdf['Time'][j]:
+        #         j += 1
+        #         if j >= len(laserdf['Time']) or i >= len(laserdf['Time']):
+        #             break
+        #         # print(veldf['linear.x'][i], laserdf['effort_0'][j], laserdf['effort_1'][j], i, j)
+        #         if (laserdf['velocity_1'][i] > 0.001):
+        #             time2.append(laserdf['Time'][i])
+        #             coef2.append((laserdf['effort_1'][j]+0.46) / laserdf['velocity_1'][i])
+        #             if (laserdf['velocity_0'][i] > 0.001):
+        #                 time.append(laserdf['Time'][i])
+        #                 coef.append((laserdf['effort_0'][j]+0.58) / laserdf['velocity_0'][i])
+        #                 timesum.append(laserdf['Time'][i])
+        #                 coefsum.append(coef[-1]+coef2[-1])
+        #
+        # plt.plot(time-timecomp,  2+np.asarray(coef) / (max(max(coef), abs(min(coef)))), label='Amperopredkosci', color=colours[k+2])
+        # plt.plot(time2-timecomp,  np.asarray(coef2) / (max(max(coef2), abs(min(coef2)))), label='Amperopredkosci', color=colours[k+2])
+        #
+        # plt.plot(timesum - timecomp, -2 + np.asarray(coefsum) / (max(max(coefsum), abs(min(coefsum)))), label='Amperopredkosci', color=colours[k+1])
+        # # plt.plot(cmdveldf['Time']-timecomp, cmdveldf['linear.x'], label='Vel x')
+        # plt.plot(laserdf['Time']-timecomp, 5+laserdf['velocity_0']*0.05, label='Vel x', color=colours[k+1])
+        # plt.plot(laserdf['Time'] - timecomp, 7 + laserdf['velocity_1'] * 0.05, label='Vel x', color=colours[k+1])
+        #
+        # # liczba 50 wynika ze sredniej maksymalnej liczby - chodzi o to zebysmy mieli odniesienie a nie normalizacje
+        # d = np.gradient(laserdf['effort_0'], laserdf['Time'])
+        # print(max(d))
+        # plt.plot(laserdf['Time']-timecomp, 5+(d/50), label='pochodna', color=colours[k])
+        #
+        # d = np.gradient(laserdf['effort_1'], laserdf['Time'])
+        # print(max(d))
+        # plt.plot(laserdf['Time']-timecomp, 7+(d/50), label='pochodna', color=colours[k])
+        #
+        # d = np.gradient(filtered.currentB, filtered.timestamp)
+        # print(max(d))
+        # # plt.plot(filtered.timestamp-timecomp, 5+(d/500), label='pochodna', color=colours[k+2])
+        # plt.plot(filtered.timestamp-timecomp, 5+(filtered.currentB/2), label='Current A', color=colours[k+2])
+        # d = np.gradient(filtered.currentA, filtered.timestamp)
+        # print(max(d))
+        # # plt.plot(filtered.timestamp-timecomp, 7+(d/500), label='pochodna', color=colours[k+2])
+        # plt.plot(filtered.timestamp-timecomp, 7+(filtered.currentA/2), label='Current B', color=colours[k+2])
+        # # liczba 200 wynika z sredniej liczby
+        # d = np.gradient(laserdf['velocity_0'], laserdf['Time'])
+        # print(max(d))
+        # plt.plot(laserdf['Time']-timecomp, 5+(d/200), label='pochodna predkosci', color=colours[k+3])
+        #
+        # d = np.gradient(laserdf['velocity_1'], laserdf['Time'])
+        # print(max(d))
+        # plt.plot(laserdf['Time']-timecomp, 7+(d/200), label='pochodna predkosci', color=colours[k+3])
+        #
+        # # plt.plot(veldf['Time']-timecomp, dist, label='Dist')
+        # d = np.gradient(dist, veldf['Time']-timecomp)
+        # print(max(d))
+        # plt.plot(veldf['Time']-timecomp, 3+(d/200), label='pochodna dystansu', color=colours[k+3])
+        #
+        # d = np.gradient(laser2df['ranges_180'], laser2df['Time'])
+        # print(max(d))
+        # plt.plot(laser2df['Time']-timecomp, 1+(d*3), label='pochodna dystansu enkoder', color=colours[k+3])
+        #
+        # #
+        # plt.plot(laserdf['Time']-timecomp, laserdf['effort_0']+0.58-5, label='Effort 0',  color=colours[k])
+        # plt.plot(laserdf['Time']-timecomp, laserdf['effort_1']+0.46-7, label='Effort 1',  color=colours[k])
+        # plt.plot(laser3df['Time']-timecomp,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
+        # plt.plot(laser4df['Time']-timecomp,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
+        # # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
+        # plt.grid()
+        # plt.legend()
+        # plt.show()
 
         new_dist = []
         j = 0
         veldf_arr = np.array(veldf['Time'])
         laserdf_arr = np.array(laserdf['Time'])
-        print(len(laserdf_arr), len(veldf_arr))
+        # print(len(laserdf_arr), len(veldf_arr))
 
         new_dist.append(dist[0])
         for i in range(0, len(laserdf['effort_0'])-1):
@@ -223,20 +230,36 @@ if __name__ == '__main__':
                     break
 
             if j >= len(veldf_arr):
+                if (len(new_dist) < len(laserdf_arr)-1):
+                    new_dist.append(dist[j - 2])
                 if (len(new_dist) < len(laserdf_arr)):
                     new_dist.append(dist[j-1])
+
                 print(len(new_dist), len(laserdf_arr))
                 break
             new_dist.append(dist[j])
-            print(i, j)
+            # print(i, j)
 
         # new_dist.append(dist[len(dist)-1])
         dist_coef = new_dist[0]
-        plt.plot(new_dist-dist_coef, laserdf['effort_0']+0.58, label='Effort 0',  color=colours[k])
-        plt.plot(new_dist-dist_coef, laserdf['effort_1']+0.46, label='Effort 1',  color=colours[k+1])
+
+        axs[k].plot(new_dist-dist_coef, laserdf['effort_0']+0.58, label='Effort 0 ',  color=colours[1])
+        axs[k].plot(new_dist-dist_coef, laserdf['effort_1']+0.46, label='Effort 1 ',  color=colours[2])
+        axs[k].plot(new_dist-dist_coef, laserdf['velocity_0']/35, label='Velocity 0 ',  color=colours[3])
+        axs[k].plot(new_dist-dist_coef, laserdf['velocity_1']/35, label='Velocity 1 ',  color=colours[4])
+        # axs[k].set_xlim(-0.5, 2.10)
+
         # plt.plot(new_dist,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
         # plt.plot(new_dist,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
         # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
-        plt.grid()
-        plt.legend()
-        plt.show()
+        axs[k].grid()
+        if (k == round(len(bags)/2)):
+            axs[k].set_ylabel("Current [A] / Velocity [rad/s]/35")
+
+        if (k == 0):
+            axs[k].legend()
+
+    #
+    plt.xlabel("Distance [m]")
+
+    plt.show()
