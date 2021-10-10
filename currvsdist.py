@@ -18,7 +18,6 @@ if __name__ == '__main__':
     timecomp = 0
 
     fig, axs = plt.subplots(len(bags))
-    # fig.suptitle('')
 
     for k in range(0, len(bags)):
         temp = read_log('current/' + logs[k], start_in_zero=False)
@@ -96,12 +95,26 @@ if __name__ == '__main__':
 
         timecomp = veldf['Time'][0]
 
-        dx = veldf['pose.x']
-        dy = veldf['pose.y']
+        dx = np.array(veldf['pose.x'])
+        dy = np.array(veldf['pose.y'])
 
-        dist = dx**2 + dy**2
-        dist = np.sqrt(dist)
+        # if (min(dx) < 0):                   # Shifting data to be in the first quadrant of the coordinate system for easier distance calculation
+        #     dx = dx + abs(min(dx))
+        # else:
+        #     dx = dx - min(dx)
+        #
+        # if (min(dy) < 0):
+        #     dy = dy + abs(min(dy))
+        # else:
+        #     dy = dy - min(dy)
 
+        print(dx[0], dy[0])
+
+        # dist = dx**2 + dy**2
+        dist = [0]
+        for i in range(0, len(dx)-1):
+            dd = math.sqrt((dx[i+1]-dx[i])**2+(dy[i+1]-dy[i])**2)
+            dist.append(dist[-1]+dd)
 
         # # plt.plot(veldf['Time'], veldf['orientation.z'])
         # plt.plot(veldf['Time'], dist, label='Dist')
@@ -240,26 +253,47 @@ if __name__ == '__main__':
             new_dist.append(dist[j])
             # print(i, j)
 
+        new_dist = np.array(new_dist)
         # new_dist.append(dist[len(dist)-1])
         dist_coef = new_dist[0]
+        print(dist_coef)
 
-        axs[k].plot(new_dist-dist_coef, laserdf['effort_0']+0.58, label='Effort 0 ',  color=colours[1])
-        axs[k].plot(new_dist-dist_coef, laserdf['effort_1']+0.46, label='Effort 1 ',  color=colours[2])
-        axs[k].plot(new_dist-dist_coef, laserdf['velocity_0']/35, label='Velocity 0 ',  color=colours[3])
-        axs[k].plot(new_dist-dist_coef, laserdf['velocity_1']/35, label='Velocity 1 ',  color=colours[4])
-        # axs[k].set_xlim(-0.5, 2.10)
+        axs[k].plot(new_dist-dist_coef, laserdf['effort_0']+0.58, label='Średni prąd, silnik 0',  color=colours[1])
+        axs[k].plot(new_dist-dist_coef, laserdf['effort_1']+0.46, label='Średni prąd, silnik 1',  color=colours[2])
+        axs[k].plot(new_dist-dist_coef, laserdf['velocity_0']/10, label='Prędkość, silnik 0',  color=colours[3])
+        axs[k].plot(new_dist-dist_coef, laserdf['velocity_1']/10, label='Prędkość, silnik 1',  color=colours[4])
+        axs[k].set_xlim(-0.05, 2.20)
 
         # plt.plot(new_dist,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
         # plt.plot(new_dist,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
         # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
         axs[k].grid()
         if (k == round(len(bags)/2)):
-            axs[k].set_ylabel("Current [A] / Velocity [rad/s]/35")
+            axs[k].set_ylabel("prąd [A] / prędkość obrotowa [rad/s]/10", fontsize=16)
 
         if (k == 0):
-            axs[k].legend()
+            axs[k].legend(loc=1)
 
+        try:
+            for i in range(0, len(vert_lines)):
+                axs[k].axvline(vert_lines[i], linestyle='--', color=colours[i], label=vert_lines[i])
+                if k == 0:
+                    axs[k].text(vert_lines[i], -0.2, vert_legend[i], fontsize=12)
+        except:
+            print("None vertical lines")
     #
-    plt.xlabel("Distance [m]")
+    plt.xlabel("Przebyty dystans [m]", fontsize=16)
+    fig.suptitle(collection_name, fontsize=16)
+    fig.set_size_inches(12, 18)
+    fig.subplots_adjust(
+        top=0.95,
+        bottom=0.049,
+        left=0.07,
+        right=0.97,
+        hspace=0.2,
+        wspace=0.2
+    )
 
-    plt.show()
+    # plt.show()
+
+    fig.savefig('current distance' + collection_name.replace("/", "").replace(".", "") + '.png')
