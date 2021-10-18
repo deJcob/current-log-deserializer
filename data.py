@@ -51,42 +51,40 @@
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Pochylnia i karton 0.7 m/s @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-# bags = ['2021-07-23-15-40-40.bag',
-#         '2021-07-23-15-42-59.bag',
-#         '2021-07-23-15-45-19.bag',
-#         '2021-07-23-15-48-15.bag',
-#         '2021-07-23-15-50-13.bag',
-#         '2021-07-23-15-52-25.bag']
-#
-# logs = ['current log 23-07-2021 15-40-41',
-#         'current log 23-07-2021 15-43-00',
-#         'current log 23-07-2021 15-45-20',
-#         'current log 23-07-2021 15-48-16',
-#         'current log 23-07-2021 15-50-13',
-#         'current log 23-07-2021 15-52-26']
-#
-# collection_name = 'Jazda na wprost, 2m, przejazd przez pochylnie oraz uderzenie w przeszkodę, v = 0.7 m/s'
-#
-# vert_lines = [0.57, 0.57+0.39, 1.4]
-# vert_legend = ['Początek rampy', 'Koniec rampy', 'Przeszkoda']
+bags = ['2021-07-23-15-40-40.bag',
+        '2021-07-23-15-45-19.bag',
+        '2021-07-23-15-48-15.bag',
+        '2021-07-23-15-50-13.bag',
+        '2021-07-23-15-52-25.bag']
+
+logs = ['current log 23-07-2021 15-40-41',
+        'current log 23-07-2021 15-45-20',
+        'current log 23-07-2021 15-48-16',
+        'current log 23-07-2021 15-50-13',
+        'current log 23-07-2021 15-52-26']
+
+collection_name = 'Jazda na wprost, 2m, przejazd przez pochylnie oraz uderzenie w przeszkodę, v = 0.7 m/s'
+
+vert_lines = [0.57, 0.57+0.39, 1.4]
+vert_legend = ['Początek rampy', 'Koniec rampy', 'Przeszkoda']
 
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Pochylnia i karton 1.7 m/s @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-logs = ['current log 23-07-2021 16-00-13',
-        'current log 23-07-2021 16-01-54',
-        'current log 23-07-2021 16-03-38',
-        'current log 23-07-2021 16-05-08',
-        'current log 23-07-2021 16-07-02']
-
-bags = ['2021-07-23-16-00-12.bag',
-        '2021-07-23-16-01-53.bag',
-        '2021-07-23-16-03-37.bag',
-        '2021-07-23-16-05-07.bag',
-        '2021-07-23-16-07-01.bag']
-
-collection_name = 'Jazda na wprost, 2m, przejazd przez pochylnie oraz uderzenie w przeszkodę, v = 1.7 m/s'
+# logs = ['current log 23-07-2021 16-00-13',
+#         'current log 23-07-2021 16-01-54',
+#         'current log 23-07-2021 16-03-38',
+#         'current log 23-07-2021 16-05-08',
+#         'current log 23-07-2021 16-07-02']
 #
+# bags = ['2021-07-23-16-00-12.bag',
+#         '2021-07-23-16-01-53.bag',
+#         '2021-07-23-16-03-37.bag',
+#         '2021-07-23-16-05-07.bag',
+#         '2021-07-23-16-07-01.bag']
+#
+# collection_name = 'Jazda na wprost, 2m, przejazd przez pochylnie oraz uderzenie w przeszkodę, v = 1.7 m/s'
+# #
 # vert_lines = [0.57, 0.57 + 0.39, 1.4]
 # # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ INNE ZMIENNE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
