@@ -22,9 +22,9 @@ if __name__ == '__main__':
     min_x = 100000
 
     for k in range(0, len(bags)):
-        bag = bp.bagreader('bags/' + bags[k])
+        bag = bp.bagreader('prec/' + bags[k])
 
-        print(bag.topic_table)
+        # print(bag.topic_table)
 
         # velmsgs = bag.odometry_data()
         # veldf = pd.read_csv(velmsgs[0])
@@ -44,26 +44,7 @@ if __name__ == '__main__':
 
         timecomp = veldf['Time'][0]
 
-        dx = np.array(veldf['pose.x'])
-        dy = np.array(veldf['pose.y'])
 
-        # if (min(dx) < 0):                   # Shifting data to be in the first quadrant of the coordinate system for easier distance calculation
-        #     dx = dx + abs(min(dx))
-        # else:
-        #     dx = dx - min(dx)
-        #
-        # if (min(dy) < 0):
-        #     dy = dy + abs(min(dy))
-        # else:
-        #     dy = dy - min(dy)
-
-        print(dx[0], dy[0])
-
-        # dist = dx**2 + dy**2
-        dist = [0]
-        for i in range(0, len(dx)-1):
-            dd = math.sqrt((dx[i+1]-dx[i])**2+(dy[i+1]-dy[i])**2)
-            dist.append(dist[-1]+dd)
 
         # # plt.plot(veldf['Time'], veldf['orientation.z'])
         # plt.plot(veldf['Time'], dist, label='Dist')
@@ -73,63 +54,62 @@ if __name__ == '__main__':
         laserdf = pd.read_csv(laser)
         cmdvel = bag.message_by_topic('/diff_drive/cmd_vel')
         cmdveldf = pd.read_csv(cmdvel)
+
         laser2 = bag.message_by_topic('/scan')
         laser2df = pd.read_csv(laser2)
+
+        laser2 = bag.message_by_topic('/robot_driver/laser_ruler/scan_0')
+        laser6df = pd.read_csv(laser2)
+        laser6df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
         laser3 = bag.message_by_topic('/robot_driver/laser_ruler/scan_1')
         laser3df = pd.read_csv(laser3)
         laser3df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
-        laser4 = bag.message_by_topic('/robot_driver/laser_ruler/scan_3')
+        laser4 = bag.message_by_topic('/robot_driver/laser_ruler/scan_2')
         laser4df = pd.read_csv(laser4)
         laser4df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
-        #laser2df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
+        laser5 = bag.message_by_topic('/robot_driver/laser_ruler/scan_3')
+        laser5df = pd.read_csv(laser5)
+        laser5df.replace([np.inf, -np.inf], 10.0).dropna(subset=["range"], how="all")
+
         imu = bag.message_by_topic('/stm_imu')
         imudf = pd.read_csv(imu)
 
-        # plt.plot(imudf['Time'], imudf['linear_acceleration.x'], label='Acc X')
-        # plt.plot(imudf['Time'], imudf['linear_acceleration.y'], label='Acc Y')
-        # plt.plot(imudf['Time'], imudf['linear_acceleration.z'], label='Acc Z')
-        # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_180'], label='lidar 180')
-        # plt.plot(laser2df['Time'], laser2df['ranges_180'], label='lidar 180')
-        # plt.plot(laserdf['Time'], laserdf['effort_0']+0.58, label='Effort 0')
-        # plt.plot(laserdf['Time'], laserdf['effort_1']+0.46, label='Effort 1')
-        # # plt.plot(laserdf['Time'], (laserdf['effort_0']+0.58)-(laserdf['effort_1']+0.45))
-        # # plt.plot(laserdf['Time'], (laserdf['effort_0']+0.58)+(laserdf['effort_1']+0.45)/veldf['linear.x'])
-        # # plt.plot(laserdf['Time'], laserdf['velocity_0']*0.05)
-        # # plt.plot(laserdf['Time'], laserdf['velocity_1']*0.05)
-        # plt.plot(laser3df['Time'], laser3df['range'], label='scan 1')
-        # plt.legend()
-        # plt.plot(cmdveldf['Time'], cmdveldf['linear.x'], label='Vel x')
-        # plt.show()
+        tim = np.array(veldf['Time'] - timecomp)
+        vel0 = np.array(veldf['linear.x'])
 
-        # plt.plot(laserdf['Time']-timecomp, laserdf['effort_0']+0.58-5, label='Effort 0',  color=colours[k])
-        # plt.plot(laserdf['Time']-timecomp, laserdf['effort_1']+0.46-7, label='Effort 1',  color=colours[k])
-        # plt.plot(laser3df['Time']-timecomp,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
-        # plt.plot(laser4df['Time']-timecomp,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
-        # # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
-        # plt.grid()
-        # plt.legend()
-        # plt.show()
+        min_tmp = 0.0
+        max_tmp = 0.0
+        for j in range(0, len(tim)):
+            if vel0[j] > 0.015:
+                min_tmp = tim[j-15]
+                print(min_tmp)
+                break
+
+        min_x = min(min_x, min_tmp)
+
+        for j, e in reversed(list(enumerate(vel0))):
+            if vel0[j] > 0.015:
+                max_tmp = tim[j + 15]-min_tmp
+                print(max_tmp)
+                break
+
+        max_x = max(max_x, max_tmp)
+
+        axs[k].plot(veldf['Time'] - timecomp-min_tmp, veldf['linear.x'], label='Prędkość liniowa', color=colours[1])
+
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_1'], label='Lidar 1', color=colours[2])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_0'], label='Lidar 0', color=colours[3])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_359'], label='Lidar -1', color=colours[4])
+        axs[k].plot(laser6df['Time']-timecomp-min_tmp,  laser6df['range']*10, label='Linijka 0', color=colours[5])
+        axs[k].plot(laser3df['Time']-timecomp-min_tmp,  laser3df['range']*10, label='Linijka 1', color=colours[6])
+        axs[k].plot(laser4df['Time']-timecomp-min_tmp,  laser4df['range']*10, label='Linijka 2', color=colours[7])
+        axs[k].plot(laser5df['Time']-timecomp-min_tmp,  laser5df['range']*10, label='Linijka 3', color=colours[8])
 
 
-        eff0 = np.array(laserdf['effort_0'] + 0.58)
-        eff1 = np.array(laserdf['effort_1'] + 0.46)
-        tim = np.array(laserdf['Time'] - timecomp)
-        vel0 = np.array(laserdf['velocity_0'])
-        vel1 = np.array(laserdf['velocity_1'])
-
-        axs[k].plot(laserdf['Time']-timecomp, laserdf['effort_0']+0.58, label='Średni prąd, silnik 0',  color=colours[1])
-        axs[k].plot(laserdf['Time']-timecomp, laserdf['effort_1']+0.46, label='Średni prąd, silnik 1',  color=colours[2])
-        axs[k].plot(laserdf['Time']-timecomp, laserdf['velocity_0']/10, label='Prędkość, silnik 0',  color=colours[3])
-        axs[k].plot(laserdf['Time']-timecomp, laserdf['velocity_1']/10, label='Prędkość, silnik 1',  color=colours[4])
-
-        max_x = max(max_x, max(tim))
-
-        # plt.plot(new_dist,  -3.5+(laser3df['range']*40), label='scan 1', color=colours[k])
-        # plt.plot(new_dist,  -3.5+(laser4df['range']*40), label='scan 3', color=colours[k])
-        # plt.plot(laser2df['Time']-timecomp, laser2df['ranges_0'], label='lidar 0')
         axs[k].grid()
+
         if (k == round(len(bags)/2)):
-            axs[k].set_ylabel("prąd [A] / prędkość obrotowa [rad/s]/10", fontsize=16)
+            axs[k].set_ylabel("Prędkość [m/s] / Odległość [m]", fontsize=16)
 
         if (k == 0):
             axs[k].legend(loc=1)
@@ -150,6 +130,6 @@ if __name__ == '__main__':
         wspace=0.2
     )
 
-    # plt.show()
+    plt.show()
 
-    fig.savefig('current time' + collection_name.replace("/", "").replace(".", "") + '.png')
+    fig.savefig('prec ster' + collection_name.replace("/", "").replace(".", "") + '.png')
