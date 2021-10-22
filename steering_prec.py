@@ -98,15 +98,17 @@ if __name__ == '__main__':
         ax2 = axs[k].twinx()
         ax2.plot(veldf['Time'] - timecomp-min_tmp, veldf['linear.x'], label='Prędkość liniowa', color=colours[1])
 
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_2']-0.1702), label='Lidar $2^o$', linestyle='-', marker='.', color=colours[1])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.1702)+0.01, label='Lidar $1^o$ (+1cm)',linestyle='-', marker='.', color=colours[2])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_0']-0.1702)+0.02, label='Lidar $0^o$ (+2cm)',linestyle='-', marker='.', color=colours[3])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_359']-0.1702)+0.03, label='Lidar $-1^o$ (+3cm)', linestyle='-', marker='.', color=colours[4])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_358']-0.1702)+0.04, label='Lidar $-2^o$ (+4cm)', linestyle='-', marker='.', color=colours[9])
-        axs[k].plot(laser6df['Time']-timecomp-min_tmp,  laser6df['range']+0.05, label='Linijka [0] (+5cm)', linestyle='-', marker=',', color=colours[8])
-        axs[k].plot(laser3df['Time']-timecomp-min_tmp,  laser3df['range']+0.06, label='Linijka [1] (+6cm)', linestyle='-', marker=',', color=colours[6])
-        axs[k].plot(laser4df['Time']-timecomp-min_tmp,  laser4df['range']+0.07, label='Linijka [2] (+7cm)', linestyle='-', marker=',', color=colours[7])
-        axs[k].plot(laser5df['Time']-timecomp-min_tmp,  laser5df['range']+0.08, label='Linijka [3] (+8cm)', linestyle='-', marker=',', color=colours[5])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_2']-0.0702), label='Lidar $2^o$ (+0.1m)', linestyle='-', marker='.', color=colours[1])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.0702), label='Lidar $1^o$ (+0.1m)',linestyle='--', marker='.', color=colours[2])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_0']-0.0702), label='Lidar $0^o$ (+0.1m)',linestyle='-.', marker='.', color=colours[3])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_359']-0.0702), label='Lidar $-1^o$ (+0.1m)', linestyle=':', marker='.', color=colours[4])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_358']-0.0702), label='Lidar $-2^o$ (+0.1m)', linestyle='-.', marker='.', color=colours[9])
+        axs[k].plot(laser6df['Time']-timecomp-min_tmp,  laser6df['range'], label='Linijka [0]', linestyle='-', marker=',', color=colours[8])
+        axs[k].plot(laser3df['Time']-timecomp-min_tmp,  laser3df['range'], label='Linijka [1]', linestyle='-', marker=',', color=colours[6])
+        axs[k].plot(laser4df['Time']-timecomp-min_tmp,  laser4df['range'], label='Linijka [2]', linestyle='-', marker=',', color=colours[7])
+        axs[k].plot(laser5df['Time']-timecomp-min_tmp,  laser5df['range'], label='Linijka [3]', linestyle='-', marker=',', color=colours[5])
+
+
 
         # axs[k].scatter(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.1702), color=colours[2])
         # axs[k].scatter(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_0']-0.1702), color=colours[3])
@@ -132,12 +134,13 @@ if __name__ == '__main__':
         axs[k].set_ylim(0.0, 0.3)
     #
 
-    # for k in range(0, len(bags)):
+    for k in range(0, len(bags)):
+        axs[k].hlines(0.10, 0.0, max_x, linestyles=':', label='Dystans dokowania')
         # axs[k].set_xlim(0.0, max_x)
         # axs[k].set_ylim(0.0, 0.35)
 
     plt.xlabel("Czas [s]", fontsize=16)
-    fig.suptitle(collection_name + ', porównanie jakości danych', fontsize=16)
+    fig.suptitle(collection_name + ', moment dokowania', fontsize=16)
     fig.set_size_inches(12, 18)
     fig.subplots_adjust(
         top=0.95,
@@ -150,4 +153,4 @@ if __name__ == '__main__':
 
     # plt.show()
 
-    fig.savefig('dokowanie_porownanie_lidar_linijka' + collection_name.replace("/", "").replace(".", "") + '.png')
+    fig.savefig('dokowanie_przodem_dokowanie' + collection_name.replace("/", "").replace(".", "") + '.png')
