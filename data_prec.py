@@ -17,7 +17,7 @@ bags = ['2021-07-24-15-55-25.bag',
 #         '2021-07-24-16-12-22.bag',
 #         '2021-07-24-16-14-47.bag',
 #         '2021-07-24-16-16-03.bag']
-#
+
 # # linijka, hamowanie
 #
 # collection_name = 'Dokowanie za pomocą linijki (0.2 m/s), z hamowaniem'

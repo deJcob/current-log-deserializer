@@ -95,41 +95,59 @@ if __name__ == '__main__':
 
         max_x = max(max_x, max_tmp)
 
-        axs[k].plot(veldf['Time'] - timecomp-min_tmp, veldf['linear.x'], label='Prędkość liniowa', color=colours[1])
+        ax2 = axs[k].twinx()
+        ax2.plot(veldf['Time'] - timecomp-min_tmp, veldf['linear.x'], label='Prędkość liniowa', color=colours[1])
 
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_1'], label='Lidar 1', color=colours[2])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_0'], label='Lidar 0', color=colours[3])
-        axs[k].plot(laser2df['Time']-timecomp-min_tmp, laser2df['ranges_359'], label='Lidar -1', color=colours[4])
-        axs[k].plot(laser6df['Time']-timecomp-min_tmp,  laser6df['range']*10, label='Linijka 0', color=colours[5])
-        axs[k].plot(laser3df['Time']-timecomp-min_tmp,  laser3df['range']*10, label='Linijka 1', color=colours[6])
-        axs[k].plot(laser4df['Time']-timecomp-min_tmp,  laser4df['range']*10, label='Linijka 2', color=colours[7])
-        axs[k].plot(laser5df['Time']-timecomp-min_tmp,  laser5df['range']*10, label='Linijka 3', color=colours[8])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_2']-0.1702), label='Lidar $2^o$', linestyle='-', marker='.', color=colours[1])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.1702)+0.01, label='Lidar $1^o$ (+1cm)',linestyle='-', marker='.', color=colours[2])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_0']-0.1702)+0.02, label='Lidar $0^o$ (+2cm)',linestyle='-', marker='.', color=colours[3])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_359']-0.1702)+0.03, label='Lidar $-1^o$ (+3cm)', linestyle='-', marker='.', color=colours[4])
+        axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_358']-0.1702)+0.04, label='Lidar $-2^o$ (+4cm)', linestyle='-', marker='.', color=colours[9])
+        axs[k].plot(laser6df['Time']-timecomp-min_tmp,  laser6df['range']+0.05, label='Linijka [0] (+5cm)', linestyle='-', marker=',', color=colours[8])
+        axs[k].plot(laser3df['Time']-timecomp-min_tmp,  laser3df['range']+0.06, label='Linijka [1] (+6cm)', linestyle='-', marker=',', color=colours[6])
+        axs[k].plot(laser4df['Time']-timecomp-min_tmp,  laser4df['range']+0.07, label='Linijka [2] (+7cm)', linestyle='-', marker=',', color=colours[7])
+        axs[k].plot(laser5df['Time']-timecomp-min_tmp,  laser5df['range']+0.08, label='Linijka [3] (+8cm)', linestyle='-', marker=',', color=colours[5])
 
+        # axs[k].scatter(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.1702), color=colours[2])
+        # axs[k].scatter(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_0']-0.1702), color=colours[3])
+        # axs[k].scatter(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_359']-0.1702), color=colours[4])
+        # axs[k].scatter(laser6df['Time']-timecomp-min_tmp,  laser6df['range'], color=colours[5])
+        # axs[k].scatter(laser3df['Time']-timecomp-min_tmp,  laser3df['range'], color=colours[6])
+        # axs[k].scatter(laser4df['Time']-timecomp-min_tmp,  laser4df['range'], color=colours[7])
+        # axs[k].scatter(laser5df['Time']-timecomp-min_tmp,  laser5df['range'], color=colours[8])
 
         axs[k].grid()
+        axs[k].set_ylabel('Dystans [m]')
+        ax2.set_ylabel('Prędkość [m/s]')
 
-        if (k == round(len(bags)/2)):
-            axs[k].set_ylabel("Prędkość [m/s] / Odległość [m]", fontsize=16)
+        # if (k == round(len(bags)/2)):
+        #     axs[k].set_ylabel("Prędkość [m/s] / Odległość [m]", fontsize=16)
 
         if (k == 0):
-            axs[k].legend(loc=1)
+            axs[k].legend(loc=2)
+            ax2.legend(loc=1)
+
+        axs[k].set_xlim(max_tmp-2, max_tmp+1)
+        ax2.set_ylim(min(vel0), max(vel0))
+        axs[k].set_ylim(0.0, 0.3)
     #
 
-    for k in range(0, len(bags)):
-        axs[k].set_xlim(0.0, max_x)
+    # for k in range(0, len(bags)):
+        # axs[k].set_xlim(0.0, max_x)
+        # axs[k].set_ylim(0.0, 0.35)
 
     plt.xlabel("Czas [s]", fontsize=16)
-    fig.suptitle(collection_name, fontsize=16)
+    fig.suptitle(collection_name + ', porównanie jakości danych', fontsize=16)
     fig.set_size_inches(12, 18)
     fig.subplots_adjust(
         top=0.95,
         bottom=0.049,
         left=0.07,
-        right=0.97,
+        right=0.93,
         hspace=0.2,
         wspace=0.2
     )
 
-    plt.show()
+    # plt.show()
 
-    fig.savefig('prec ster' + collection_name.replace("/", "").replace(".", "") + '.png')
+    fig.savefig('dokowanie_porownanie_lidar_linijka' + collection_name.replace("/", "").replace(".", "") + '.png')
