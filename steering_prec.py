@@ -76,6 +76,7 @@ if __name__ == '__main__':
 
         tim = np.array(veldf['Time'] - timecomp)
         vel0 = np.array(veldf['linear.x'])
+        cmdvel0 = np.array(cmdveldf['linear.x'])
 
         min_tmp = 0.0
         max_tmp = 0.0
@@ -89,7 +90,7 @@ if __name__ == '__main__':
 
         for j, e in reversed(list(enumerate(vel0))):
             if vel0[j] > 0.015:
-                max_tmp = tim[j + 15]-min_tmp
+                max_tmp = tim[j + 50]-min_tmp
                 print(max_tmp)
                 break
 
@@ -97,6 +98,7 @@ if __name__ == '__main__':
 
         ax2 = axs[k].twinx()
         ax2.plot(veldf['Time'] - timecomp-min_tmp, veldf['linear.x'], label='Prędkość liniowa', color=colours[1])
+        ax2.plot(cmdveldf['Time'] - timecomp-min_tmp, cmdveldf['linear.x'], label='Prędkość zadana', color=colours[2])
 
         axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_2']-0.0702), label='Lidar $2^o$ (+0.1m)', linestyle='-', marker='.', color=colours[1])
         axs[k].plot(laser2df['Time']-timecomp-min_tmp, (laser2df['ranges_1']-0.0702), label='Lidar $1^o$ (+0.1m)',linestyle='--', marker='.', color=colours[2])
@@ -125,22 +127,26 @@ if __name__ == '__main__':
         # if (k == round(len(bags)/2)):
         #     axs[k].set_ylabel("Prędkość [m/s] / Odległość [m]", fontsize=16)
 
+        axs[k].hlines(0.10, 0.0, max_x, linestyles=':', color=colours[0], label='Dystans dokowania (linijka)')
+        axs[k].hlines(0.20, 0.0, max_x, linestyles=':', color=colours[2], label='Dystans dokowania (lidar)')
+
         if (k == 0):
             axs[k].legend(loc=2)
             ax2.legend(loc=1)
 
-        axs[k].set_xlim(max_tmp-2, max_tmp+1)
-        ax2.set_ylim(min(vel0), max(vel0))
-        axs[k].set_ylim(0.0, 0.3)
+        # axs[k].set_xlim(max_tmp-2, max_tmp+1)
+        ax2.set_ylim(min(min(cmdvel0), min(vel0))-0.02, max(max(vel0), max(cmdvel0))+0.02)
+        axs[k].set_ylim(0.0, 0.7)
     #
 
     for k in range(0, len(bags)):
-        axs[k].hlines(0.10, 0.0, max_x, linestyles=':', label='Dystans dokowania')
-        # axs[k].set_xlim(0.0, max_x)
+        axs[k].set_xlim(0.0, max_x)
+        axs[k].hlines(0.10, 0.0, max_x, linestyles=':', color=colours[0], label='Dystans dokowania (linijka)')
+        axs[k].hlines(0.20, 0.0, max_x, linestyles=':', color=colours[2], label='Dystans dokowania (lidar)')
         # axs[k].set_ylim(0.0, 0.35)
 
     plt.xlabel("Czas [s]", fontsize=16)
-    fig.suptitle(collection_name + ', moment dokowania', fontsize=16)
+    fig.suptitle(collection_name, fontsize=16)
     fig.set_size_inches(12, 18)
     fig.subplots_adjust(
         top=0.95,
@@ -153,4 +159,4 @@ if __name__ == '__main__':
 
     # plt.show()
 
-    fig.savefig('dokowanie_przodem_dokowanie' + collection_name.replace("/", "").replace(".", "") + '.png')
+    fig.savefig('dokowanie_przodem_calosc' + collection_name.replace("/", "").replace(".", "") + '.png')
